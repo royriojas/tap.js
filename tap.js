@@ -63,24 +63,14 @@
         this.el.removeEventListener('mouseup', this, false);
 
         if (!this.moved) {
-            //create custom event
-            if (window.CustomEvent) {
-                evt = new window.CustomEvent('tap', {
-                    bubbles: true,
-                    cancelable: true
-                });
-            } else {
-                evt = document.createEvent('Event');
-                evt.initEvent('tap', true, true);
-            }
+            var eventHelper = require('dom-event-special');
 
-            //prevent touchend from propagating to any parent
-            //nodes that may have a tap.js listener attached
-            e.stopPropagation();
+            var evt = eventHelper.fire(e.target, 'tap', {
+                bubbles: true,
+                cancelable: true
+            });
 
-            // dispatchEvent returns false if any handler calls preventDefault,
-            if (!e.target.dispatchEvent(evt)) {
-                // in which case we want to prevent clicks from firing.
+            if (!evt) {
                 e.preventDefault();
             }
         }

@@ -21,5 +21,8 @@
   "bugs": {
     "url": "https://github.com/alexgibson/tap.js/issues"
   },
-  "homepage": "https://github.com/alexgibson/tap.js"
+  "homepage": "https://github.com/alexgibson/tap.js",
+  "dependencies": {
+    "dom-event-special": "^0.1.6"
+  }
 }
