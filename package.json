@@ -1,6 +1,6 @@
 {
   "name": "xtap-event",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A custom tap event JavaScript plugin for mobile and tablet web browsers",
   "main": "index.js",
   "scripts": {
