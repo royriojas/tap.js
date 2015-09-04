@@ -1,10 +1,24 @@
 {
-  "name": "tap.js",
-  "version": "2.1.1",
+  "name": "xtap-event",
+  "version": "1.0.0",
   "description": "A custom tap event JavaScript plugin for mobile and tablet web browsers",
-  "main": "tap.js",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "beautify": "esbeautifier 'index.js' 'specs/**/*.js'",
+    "beautify-check": "esbeautifier -k 'index.js' 'specs/**/*.js'",
+    "eslint": "eslinter 'index.js' 'specs/**/*.js'",
+    "lint": "npm run beautify && npm run eslint",
+    "verify": "npm run beautify-check && npm run eslint",
+    "install-hooks": "prepush install && changelogx install-hook && precommit install",
+    "changelog": "changelogx -f markdown -o ./changelog.md",
+    "do-changelog": "npm run changelog && git add ./changelog.md && git commit -m 'DOC: Generate changelog' --no-verify",
+    "pre-v": "npm run verify",
+    "post-v": "npm run do-changelog && git push --no-verify && git push --tags --no-verify",
+    "bump-major": "npm run pre-v && npm version major -m 'BLD: Release v%s' && npm run post-v",
+    "bump-minor": "npm run pre-v && npm version minor -m 'BLD: Release v%s' && npm run post-v",
+    "bump-patch": "npm run pre-v && npm version patch -m 'BLD: Release v%s' && npm run post-v",
+    "bundle": "persistify demo.js -o dist/bundle.js",
+    "bundle:watch": "persistify demo.js -o dist/bundle.js --watch"
   },
   "repository": {
     "type": "git",
@@ -24,5 +38,14 @@
   "homepage": "https://github.com/alexgibson/tap.js",
   "dependencies": {
     "dom-event-special": "^0.1.6"
+  },
+  "devDependencies": {
+    "babelify": "^6.3.0",
+    "changelogx": "^1.0.18",
+    "esbeautifier": "^4.2.11",
+    "eslinter": "^2.3.3",
+    "persistify": "^0.2.0",
+    "precommit": "^1.1.5",
+    "prepush": "^3.1.4"
   }
 }
