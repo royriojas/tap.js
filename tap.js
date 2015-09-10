@@ -3,16 +3,16 @@ var debounce = require( 'debouncy' );
 function Tap( el ) {
   var me = this;
 
-  var ele = me.el = typeof el === 'object' ? el : document.getElementById( el );
+  var ele = me.el = (typeof el === 'object' && el !== null) ? el : document.getElementById( el );
   me.moved = false; // flags if the finger has moved
   me.startX = 0; // starting x coordinate
   me.startY = 0; // starting y coordinate
 
   me._mouseEventsAllowed = true; // we allow mouse events to also generate the tap event
 
-  me.setMouseEventsAllowed = debounce(function () {
+  me.setMouseEventsAllowed = debounce( function () {
     me._mouseEventsAllowed = true;
-  }, 500);
+  }, 500 );
 
   ele.addEventListener( 'touchstart', me, false );
   ele.addEventListener( 'mousedown', me, false );
@@ -55,7 +55,7 @@ tapProto.start = function ( e ) {
     me.blockMouseEvents();
   }
 
-  if ( e.type === 'mousedown' && me._mouseEventsAllowed) {
+  if ( e.type === 'mousedown' && me._mouseEventsAllowed ) {
     ele.addEventListener( 'mousemove', me, false );
     ele.addEventListener( 'mouseup', me, false );
   }
