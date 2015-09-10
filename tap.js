@@ -1,11 +1,18 @@
+var debounce = require( 'debouncy' );
+
 function Tap( el ) {
   var me = this;
 
   var ele = me.el = typeof el === 'object' ? el : document.getElementById( el );
-  me.moved = false; //flags if the finger has moved
-  me.startX = 0; //starting x coordinate
-  me.startY = 0; //starting y coordinate
-  me.hasTouchEventOccured = false; //flag touch event
+  me.moved = false; // flags if the finger has moved
+  me.startX = 0; // starting x coordinate
+  me.startY = 0; // starting y coordinate
+
+  me._mouseEventsAllowed = true; // we allow mouse events to also generate the tap event
+
+  me.setMouseEventsAllowed = debounce(function () {
+    me._mouseEventsAllowed = true;
+  }, 500);
 
   ele.addEventListener( 'touchstart', me, false );
   ele.addEventListener( 'mousedown', me, false );
@@ -13,34 +20,42 @@ function Tap( el ) {
 
 var tapProto = Tap.prototype;
 
-tapProto._getClientX = function (e) {
-  if (e.touches && e.touches.length > 0) {
-    return e.touches[0].clientX;
+tapProto.blockMouseEvents = function () {
+  var me = this;
+  me._mouseEventsAllowed = false;
+  me.setMouseEventsAllowed();
+};
+
+tapProto._getClientX = function ( e ) {
+  if ( e.touches && e.touches.length > 0 ) {
+    return e.touches[ 0 ].clientX;
   }
   return e.clientX;
 };
 
-tapProto._getClientY = function (e) {
-  if (e.touches && e.touches.length > 0) {
-    return e.touches[0].clientY;
+tapProto._getClientY = function ( e ) {
+  if ( e.touches && e.touches.length > 0 ) {
+    return e.touches[ 0 ].clientY;
   }
   return e.clientY;
 };
 
 tapProto.start = function ( e ) {
   var me = this;
+
   var ele = me.el;
 
   me.startTime = Date.now();
 
   if ( e.type === 'touchstart' ) {
-
-    me.hasTouchEventOccured = true;
     ele.addEventListener( 'touchmove', me, false );
     ele.addEventListener( 'touchend', me, false );
     ele.addEventListener( 'touchcancel', me, false );
 
-  } else if ( e.type === 'mousedown' ) {
+    me.blockMouseEvents();
+  }
+
+  if ( e.type === 'mousedown' && me._mouseEventsAllowed) {
     ele.addEventListener( 'mousemove', me, false );
     ele.addEventListener( 'mouseup', me, false );
   }
@@ -48,14 +63,14 @@ tapProto.start = function ( e ) {
   me.startTarget = e.target;
 
   me.moved = false;
-  me.startX = me._getClientX(e); //e.type === 'touchstart' ? e.touches[ 0 ].clientX : e.clientX;
-  me.startY = me._getClientY(e);//e.type === 'touchstart' ? e.touches[ 0 ].clientY : e.clientY;
+  me.startX = me._getClientX( e ); //e.type === 'touchstart' ? e.touches[ 0 ].clientX : e.clientX;
+  me.startY = me._getClientY( e ); //e.type === 'touchstart' ? e.touches[ 0 ].clientY : e.clientY;
 };
 
 tapProto.move = function ( e ) {
   var me = this;
   //if finger moves more than 10px flag to cancel
-  if ( Math.abs( me._getClientX(e) - this.startX ) > 10 || Math.abs( me._getClientY(e) - this.startY ) > 10 ) {
+  if ( Math.abs( me._getClientX( e ) - this.startX ) > 10 || Math.abs( me._getClientY( e ) - this.startY ) > 10 ) {
     this.moved = true;
   }
 };
@@ -64,7 +79,7 @@ tapProto.end = function ( e ) {
   var me = this;
   var ele = me.el;
 
-  ele.removeEventListener( 'mousemove', me, false);
+  ele.removeEventListener( 'mousemove', me, false );
   ele.removeEventListener( 'touchmove', me, false );
   ele.removeEventListener( 'touchend', me, false );
   ele.removeEventListener( 'touchcancel', me, false );
@@ -76,17 +91,17 @@ tapProto.end = function ( e ) {
     var endTime = Date.now();
 
     var eventHelper = require( 'dom-event-special' );
-    if ( endTime - me.startTime > 500) { // more than 500ms between start and end and we ignore the event
+    if ( endTime - me.startTime > 500 ) { // more than 500ms between start and end and we ignore the event
       me.startTime = null;
       return;
     }
 
-    if (e.target !== me.startTarget) { // if the target is not the same as the starting one
+    if ( target !== me.startTarget ) { // if the target is not the same as the starting one
       me.startTarget = null;
       return;
     }
 
-    eventHelper.fire( e.target, 'tap', {
+    eventHelper.fire( target, 'tap', {
       bubbles: true,
       cancelable: true
     } );
@@ -96,7 +111,7 @@ tapProto.end = function ( e ) {
 
 tapProto.cancel = function () {
   var me = this;
-  me.hasTouchEventOccured = false;
+
   me.moved = false;
   me.startX = 0;
   me.startY = 0;
@@ -106,6 +121,7 @@ tapProto.destroy = function () {
   var me = this;
   var ele = me.el;
 
+  me.handlingStart = false;
   ele.removeEventListener( 'touchstart', me, false );
   ele.removeEventListener( 'touchmove', me, false );
   ele.removeEventListener( 'touchend', me, false );

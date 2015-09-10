@@ -42,6 +42,7 @@
   "devDependencies": {
     "babelify": "^6.3.0",
     "changelogx": "^1.0.18",
+    "debouncy": "^1.0.4",
     "esbeautifier": "^4.2.11",
     "eslinter": "^2.3.3",
     "persistify": "^0.2.0",
