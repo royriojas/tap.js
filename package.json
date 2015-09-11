@@ -4,9 +4,9 @@
   "description": "A custom tap event JavaScript plugin for mobile and tablet web browsers, forked from tap.js",
   "main": "index.js",
   "scripts": {
-    "beautify": "esbeautifier 'index.js' 'specs/**/*.js'",
-    "beautify-check": "esbeautifier -k 'index.js' 'specs/**/*.js'",
-    "eslint": "eslinter 'index.js' 'specs/**/*.js'",
+    "beautify": "esbeautifier 'index.js' 'tap.js' 'specs/**/*.js'",
+    "beautify-check": "esbeautifier -k 'index.js' 'tap.js' 'specs/**/*.js'",
+    "eslint": "eslinter 'index.js' 'tap.js' 'specs/**/*.js'",
     "lint": "npm run beautify && npm run eslint",
     "verify": "npm run beautify-check && npm run eslint",
     "install-hooks": "prepush install && changelogx install-hook && precommit install",
@@ -37,7 +37,8 @@
   },
   "homepage": "https://github.com/royriojas/tap.js",
   "dependencies": {
-    "dom-event-special": "^0.1.6"
+    "dom-event-special": "^0.1.6",
+    "extend": "^3.0.0"
   },
   "devDependencies": {
     "babelify": "^6.3.0",
